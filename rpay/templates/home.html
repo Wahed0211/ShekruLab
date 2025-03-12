@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Payment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .payment-card {
+            max-width: 400px;
+            margin: auto;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .payment-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .payment-body {
+            padding: 20px;
+        }
+        .payment-option {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.3s;
+        }
+        .payment-option:hover, .payment-option.active {
+            background-color: #f8f9fa;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container text-center mt-5">
+        <div class="card shadow payment-card">
+            <div class="payment-header">Acme Corp - Razorpay Trusted Business</div>
+            <div class="payment-body">
+                <h4 class="mb-3">Payment Options</h4>
+                <input type="number" id="amount" class="form-control mb-3" placeholder="Enter Amount (INR)">
+                
+                <div class="payment-option" onclick="selectPaymentMethod('upi', this)">
+                    <span>UPI</span> 
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/UPI-Logo-vector.svg" height="20">
+                </div>
+                <div class="payment-option" onclick="selectPaymentMethod('card', this)">
+                    <span>Cards</span> 
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" height="20">
+                </div>
+                <div class="payment-option" onclick="selectPaymentMethod('wallet', this)">
+                    <span>Wallet</span> 
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Paytm_logo.png" height="20">
+                </div>
+                <div class="payment-option" onclick="selectPaymentMethod('netbanking', this)">
+                    <span>Netbanking</span> 
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/HDFC_Bank_Logo.svg" height="20">
+                </div>
+                
+                <button id="pay-btn" class="btn btn-primary w-100 mt-3" disabled>Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        let selectedPaymentMethod = null;
+
+        function selectPaymentMethod(method, element) {
+            selectedPaymentMethod = method;
+
+            // Remove active class from all options
+            document.querySelectorAll('.payment-option').forEach(option => option.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById("pay-btn").disabled = false; // Enable button
+        }
+
+        function startPayment() {
+            let amount = document.getElementById("amount").value;
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount");
+                return;
+            }
+            if (!selectedPaymentMethod) {
+                alert("Please select a payment method");
+                return;
+            }
+
+            fetch("/create-order/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: amount * 100, payment_method: selectedPaymentMethod }) // Razorpay accepts amount in paise
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.order_id) {
+                    var options = {
+                        key: "{{ razorpay_key }}",
+                        amount: data.amount,
+                        currency: "INR",
+                        name: "Acme Corp",
+                        description: "Payment for selected plan",
+                        order_id: data.order_id,
+                        prefill: {
+                            method: selectedPaymentMethod  // Pass selected method
+                        },
+                        handler: function (response) {
+                            fetch("/verify-payment/", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify(response)
+                            })
+                            .then(res => res.json())
+                            .then(data => alert(data.message));
+                        }
+                    };
+
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } else {
+                    alert("Error creating order");
+                }
+            });
+        }
+
+        document.getElementById("pay-btn").addEventListener("click", startPayment);
+    </script>
+</body>
+</html>

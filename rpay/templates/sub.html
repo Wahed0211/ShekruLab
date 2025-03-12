@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Plans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function redirectToUser(plan, price) {
+            window.location.href = `/user/?plan=${plan}&price=${price}`;
+        }
+    </script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="max-w-5xl w-full text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">Subscription Plans</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-gray-500">
+                <h3 class="text-xl font-semibold text-gray-700">Silver Plan</h3>
+                <p class="text-2xl font-bold my-4">$100</p>
+                <ul class="text-gray-600 space-y-2 mb-4">
+                    <li>&#10003; 100,000 Downloads</li>
+                    <li>&#10003; Basic Support</li>
+                    <li>&#10003; Basic Analytics</li>
+                </ul>
+                <button onclick="redirectToUser('Silver', 100)" class="block w-full bg-gray-500 text-white py-2 rounded-lg">Subscribe</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-yellow-500">
+                <h3 class="text-xl font-semibold text-gray-700">Gold Plan</h3>
+                <p class="text-2xl font-bold my-4">$200</p>
+                <ul class="text-gray-600 space-y-2 mb-4">
+                    <li>&#10003; 200,000 Downloads</li>
+                    <li>&#10003; 24/7 Support</li>
+                    <li>&#10003; Advanced Analytics</li>
+                </ul>
+                <button onclick="redirectToUser('Gold', 200)" class="block w-full bg-yellow-500 text-white py-2 rounded-lg">Subscribe</button>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500">
+                <h3 class="text-xl font-semibold text-gray-700">Platinum Plan</h3>
+                <p class="text-2xl font-bold my-4">$300</p>
+                <ul class="text-gray-600 space-y-2 mb-4">
+                    <li>&#10003; 300,000 Downloads</li>
+                    <li>&#10003; 24/7 Premium Support</li>
+                    <li>&#10003; Advanced Analytics & Reports</li>
+                </ul>
+                <button onclick="redirectToUser('Platinum', 300)" class="block w-full bg-blue-500 text-white py-2 rounded-lg">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
